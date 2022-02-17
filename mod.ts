@@ -7,7 +7,7 @@ export enum PinDirection {
  * Not adding sudo might misbehave on repeated runs.
  */
 // deno-lint-ignore prefer-const
-let FORCE_SUDO = true;
+export let FORCE_SUDO = true;
 
 async function runEchoReplaceCommand(value: string, toFile: string){
     return await Deno.run({
