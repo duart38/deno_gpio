@@ -70,7 +70,7 @@ export class Pin {
     }
 
     async setDirection(d: PinDirection) {
-        return await runEchoReplaceCommand(d, `/sys/class/gpio/gpio${this.number.toString()}/direction`)
+        return await runEchoReplaceCommand(d, `/sys/class/gpio/gpio${this.number}/direction`)
     }
 
 
