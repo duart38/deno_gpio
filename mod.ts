@@ -4,7 +4,7 @@ export enum PinDirection {
 }
 
 async function runEchoReplaceCommand(value: string, toFile: string){
-    await Deno.run({
+    return await Deno.run({
         cmd: ["bash","-c", `echo ${value} > ${toFile}`]
     }).status()
 }
@@ -60,11 +60,11 @@ export class Pin {
      */
     async setPin(value: number){
         await this.ready
-        await runEchoReplaceCommand(value.toString(), `/sys/class/gpio/gpio${this.number}/value`)
+        return await runEchoReplaceCommand(value.toString(), `/sys/class/gpio/gpio${this.number}/value`)
     }
 
     async setDirection(d: PinDirection) {
-        await runEchoReplaceCommand(d, `/sys/class/gpio/gpio${this.number.toString()}/direction`)
+        return await runEchoReplaceCommand(d, `/sys/class/gpio/gpio${this.number.toString()}/direction`)
     }
 
 
@@ -77,12 +77,16 @@ export class Pin {
     }
 
     static async exportPin(pin: Pin){
-        await runEchoReplaceCommand(pin.number.toString(), "/sys/class/gpio/export")
+        return await runEchoReplaceCommand(pin.number.toString(), "/sys/class/gpio/export")
+    }
+    
+    async unexport() {
+        return await Pin.unexportPin(this)
     }
     
     static async unexportPin(pin: Pin | number){
         const pinNumber: string = (typeof pin === "number" ? pin : pin.number).toString();
-        await runEchoReplaceCommand(pinNumber, "/sys/class/gpio/unexport")
+        return await runEchoReplaceCommand(pinNumber, "/sys/class/gpio/unexport")
     }
 
     static async isExported(pin: Pin): Promise<boolean> {
