@@ -51,10 +51,13 @@ export class Pin {
     // TODO: sequence method to run all async methods provided in sequence
 
 
-    // TODO: If an input pin, read the pin's level (low or high).
-    // TODO: what about analogue pin support
     async readPin(){
-
+        await this.ready;
+        return new TextDecoder().decode(
+            await Deno
+            .run({cmd: ["cat", `/sys/class/gpio/gpio${this.number}/value`], stdout: 'piped'})
+            .output()
+        )
     }
 
     /**
