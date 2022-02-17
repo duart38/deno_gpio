@@ -36,7 +36,6 @@ export class Pin {
     readonly number: VPinNumber;
     ready: Promise<void>;
 
-    // TODO: identify safety of pin with parameter? e.g. unsafe: bool
     // TODO: implement options
     constructor(number: VPinNumber, direction: PinDirection, options: Options = defaultOptions){
         this.number = number;
@@ -51,11 +50,8 @@ export class Pin {
     }
 
 
-    // TODO: If an output pin, set the level to low or high.
     // TODO: If an input pin, read the pin's level (low or high).
-
     // TODO: what about analogue pin support
-
     async readPin(){
 
     }
