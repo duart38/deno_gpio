@@ -89,7 +89,11 @@ export class Pin {
         return await runEchoReplaceCommand(pinNumber, "/sys/class/gpio/unexport")
     }
 
-    static async isExported(pin: Pin): Promise<boolean> {
+    async isExported(){
+        return await Pin.isPinExported(this);
+    }
+
+    static async isPinExported(pin: Pin): Promise<boolean> {
         return new TextDecoder()
         .decode(await Deno.run({cmd: ["ls", "/sys/class/gpio"], stdout: "piped"}).output())
         .includes(`gpio${pin.number}`);
