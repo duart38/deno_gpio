@@ -48,6 +48,7 @@ export class Pin {
 
         unexportOnGC(this);
     }
+    // TODO: sequence method to run all async methods provided in sequence
 
 
     // TODO: If an input pin, read the pin's level (low or high).
