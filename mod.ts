@@ -73,6 +73,10 @@ export class Pin {
     // TODO: sequence method to run all async methods provided in sequence
 
 
+    /**
+     * Reads the value of this pin.
+     * @returns the value of the pin (1 or 0)
+     */
     async readPin(){
         await this.ready;
         return new TextDecoder().decode(
@@ -83,19 +87,29 @@ export class Pin {
     }
 
     /**
-     * 
+     * Sets the pin value. to be used when the direction is set to out
      * @param value 0 for low, 1 for high
+     * @returns status of the operation
      */
     async setPin(value: number){
         await this.ready
         return await runEchoReplaceCommand(value.toString(), `/sys/class/gpio/gpio${this.number}/value`)
     }
 
+    /**
+     * Sets the pin direction (in or out)
+     * @param d the direction
+     * @returns status of the operation
+     */
     async setDirection(d: PinDirection) {
         return await runEchoReplaceCommand(d, `/sys/class/gpio/gpio${this.number}/direction`)
     }
 
-
+    /**
+     * Fetches the current pin direction from the system.
+     * > Useful if other programs will be changing the pin direction.
+     * @returns the pin direction
+     */
     async getDirection(): Promise<PinDirection> {
         return new TextDecoder().decode(
             await Deno
@@ -104,10 +118,19 @@ export class Pin {
         ).includes('out') ? PinDirection.OUT : PinDirection.IN;
     }
 
+    /**
+     * Exports a pin. required before you operate with the pin.
+     * @param pin the pin to export
+     * @returns the process status
+     */
     static async exportPin(pin: Pin){
         return await runEchoReplaceCommand(pin.number.toString(), "/sys/class/gpio/export")
     }
     
+    /**
+     * Removes an exported pin.
+     * @returns the status of the process
+     */
     async unexport() {
         return await Pin.unexportPin(this)
     }
@@ -117,6 +140,10 @@ export class Pin {
         return await runEchoReplaceCommand(pinNumber, "/sys/class/gpio/unexport")
     }
 
+    /**
+     * Checks if this pin is already exported.
+     * @returns true if the pin is exported, false otherwise.
+     */
     async isExported(){
         return await Pin.isPinExported(this);
     }
