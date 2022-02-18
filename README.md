@@ -19,6 +19,19 @@ setTimeout(async ()=>{
 As denoted in the code above, it is not mandatory to unexport the pins as the library will attempt to do that at program exit but it is **highly recommended** you do so manually for in the case that the library fails to unexport.
 > async awaits can be removed if pin ordering does not matter to you.
 
+### Listening for button press
+```TypeScript
+const button = new Pin(24, PinDirection.IN);
+
+while(true){
+    if(await button.readPin() == 1){
+        console.log("button pressed");
+        await button.unexport();
+        break;
+    }
+}
+```
+
 # Methods
 TODO
 
