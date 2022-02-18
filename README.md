@@ -14,6 +14,7 @@ setTimeout(async ()=>{
 }, 3000)
 ```
 As denoted in the code above, it is not mandatory to unexport the pins as the library will attempt to do that at program exit but it is **highly recommended** you do so manually for in the case that the library fails to unexport.
+> async awaits can be removed if pin ordering does not matter to you.
 
 # Limitations
 1. JavaScript it not very 'precise'. i.e. no microsecond delay support for interacting with hardware that requires this (e.g. DHT11)
