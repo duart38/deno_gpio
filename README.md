@@ -12,8 +12,8 @@ An interface for interacting and reading from the raspberry pi GPIO pins using *
 const pin23 = new Pin(23, PinDirection.OUT, 1); 
 
 setTimeout(async ()=>{
-    console.log(await pin23.setPin(0)); // Sets pin back to 0
-    console.log(await pin23.unexport()); // unexport the pin after usage. can be done automatically
+    await pin23.setPin(0); // Sets pin back to 0
+    await pin23.unexport(); // unexport the pin after usage. can be done automatically
 }, 3000)
 ```
 As denoted in the code above, it is not mandatory to unexport the pins as the library will attempt to do that at program exit but it is **highly recommended** you do so manually for in the case that the library fails to unexport.
