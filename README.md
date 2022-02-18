@@ -1,6 +1,9 @@
 # Raspberry pi GPIO helpers made for Deno
 An interface for interacting and reading from the raspberry pi GPIO pins using *sysfs*
 
+## Why?
+> Just for shits and giggles.
+> Also why not? LOL!
 
 # Examples
 ### Turning on an LED:
