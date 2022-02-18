@@ -15,6 +15,9 @@ setTimeout(async ()=>{
 ```
 As denoted in the code above, it is not mandatory to unexport the pins as the library will attempt to do that at program exit but it is **highly recommended** you do so manually for in the case that the library fails to unexport.
 
+# Limitations
+1. JavaScript it not very 'precise'. i.e. no microsecond delay support for interacting with hardware that requires this (e.g. DHT11)
+
 # Deno on the pi?
 > YES!!!!
 [This will explain it all](https://github.com/LukeChannings/deno-arm64)
