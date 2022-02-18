@@ -5,8 +5,11 @@ An interface for interacting and reading from the raspberry pi GPIO pins using *
 # Examples
 ### Turning on an LED:
 ```TypeScript
-const pin21 = new Pin(23, PinDirection.OUT); // set pin direction to out. will auto-export the pin
-await pin21.setPin(1); // sets the pin value. RPs do not have analogue: 1 for HIGH 0 for LOW
+/*
+- set pin direction to out. will auto-export the pin
+- also sets the pin value. RPs do not have analogue: 1 for HIGH 0 for LOW
+*/
+const pin21 = new Pin(23, PinDirection.OUT, 1); 
 
 setTimeout(async ()=>{
     console.log(await pin21.setPin(0)); // Sets pin back to 0
