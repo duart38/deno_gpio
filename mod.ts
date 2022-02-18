@@ -37,12 +37,20 @@ export class Pin {
     ready: Promise<void>;
 
     // TODO: implement options
-    constructor(number: VPinNumber, direction: PinDirection, options: Options = defaultOptions){
+    /**
+     * 
+     * @param number The GPIO pin number (e.g. GPIO23 -> 23)
+     * @param direction The current flow direction. in being to receive and out being to send out
+     * @param initialState optional property to automatically set the state as soon as pin is exported
+     * @param options further configuration.
+     */
+    constructor(number: VPinNumber, direction: PinDirection, initialState?: number, options: Options = defaultOptions){
         this.number = number;
         this.ready = new Promise((resolve)=>{
             Pin.exportPin(this).then(async ()=>{
                 await this.setDirection(direction);
-                resolve()
+                resolve();
+                if(initialState !== undefined) await this.setPin(initialState);
             })
         })
 
