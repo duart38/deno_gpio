@@ -4,6 +4,20 @@ export enum PinDirection {
 }
 
 /**
+ * Sleep for the given microseconds.
+ * > NOTE: requires the use of --allow-hrtime for this method to work.
+ * > NOTE: this isint really that accurate.. considering it's javascript and all
+ * @example ``` deno run --allow-hrtime <script>```
+ * @requires --allow-hrtime
+ * @param v the amount of microseconds before resolving the promise
+ * @returns a promise that resolves after the time has passed
+ */
+ export function sleepMicroseconds(v: number){
+    const end = performance.now() + parseFloat(`0.${v}`);
+    while(performance.now() < end);
+}
+
+/**
  * Not adding sudo might misbehave on repeated runs.
  */
 // deno-lint-ignore prefer-const
