@@ -9,15 +9,18 @@ An interface for interacting and reading from the raspberry pi GPIO pins using *
 - set pin direction to out. will auto-export the pin
 - also sets the pin value. RPs do not have analogue: 1 for HIGH 0 for LOW
 */
-const pin21 = new Pin(23, PinDirection.OUT, 1); 
+const pin23 = new Pin(23, PinDirection.OUT, 1); 
 
 setTimeout(async ()=>{
-    console.log(await pin21.setPin(0)); // Sets pin back to 0
-    console.log(await pin21.unexport()); // unexport the pin after usage. can be done automatically
+    console.log(await pin23.setPin(0)); // Sets pin back to 0
+    console.log(await pin23.unexport()); // unexport the pin after usage. can be done automatically
 }, 3000)
 ```
 As denoted in the code above, it is not mandatory to unexport the pins as the library will attempt to do that at program exit but it is **highly recommended** you do so manually for in the case that the library fails to unexport.
 > async awaits can be removed if pin ordering does not matter to you.
+
+# Methods
+TODO
 
 # Limitations
 1. JavaScript it not very 'precise'. i.e. no microsecond delay support for interacting with hardware that requires this (e.g. DHT11)
