@@ -40,10 +40,16 @@ export interface Options {
     /**
      * Wether we should un-export the pin if a termination OS signal is captured.
      */
-    unexportOnSig: boolean
+    unexportOnSig: boolean,
+    /**
+     * The raspberry pi does not have any analog pins.
+     * I can dream, cant i?
+     */
+    analog: boolean,
 }
 const defaultOptions: Options = {
-    unexportOnSig: true
+    unexportOnSig: true,
+    analog: false
 }
 
 export class Pin {
@@ -79,13 +85,9 @@ export class Pin {
      */
     async readPin(): Promise<number> {
         await this.ready;
-        return Number(
-                new TextDecoder().decode(
-                await Deno
-                .run({cmd: ["cat", `/sys/class/gpio/gpio${this.number}/value`], stdout: 'piped'})
-                .output()
-            )
-        )
+        return (await Deno
+            .run({cmd: ["cat", `/sys/class/gpio/gpio${this.number}/value`], stdout: 'piped'})
+            .output())[0] - 48
     }
 
     /**
