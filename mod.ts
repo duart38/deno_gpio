@@ -77,12 +77,14 @@ export class Pin {
      * Reads the value of this pin.
      * @returns the value of the pin (1 or 0)
      */
-    async readPin(){
+    async readPin(): Promise<number> {
         await this.ready;
-        return new TextDecoder().decode(
-            await Deno
-            .run({cmd: ["cat", `/sys/class/gpio/gpio${this.number}/value`], stdout: 'piped'})
-            .output()
+        return Number(
+                new TextDecoder().decode(
+                await Deno
+                .run({cmd: ["cat", `/sys/class/gpio/gpio${this.number}/value`], stdout: 'piped'})
+                .output()
+            )
         )
     }
 
