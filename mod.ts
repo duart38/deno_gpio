@@ -58,7 +58,7 @@ export class Pin {
 
     // TODO: implement options
     /**
-     * 
+     * Instantiates a new pin for usage. the newly created pin will be automatically exported.
      * @param number The GPIO pin number (e.g. GPIO23 -> 23)
      * @param direction The current flow direction. in being to receive and out being to send out
      * @param initialState optional property to automatically set the state as soon as pin is exported
@@ -76,8 +76,6 @@ export class Pin {
 
         unexportOnGC(this);
     }
-    // TODO: sequence method to run all async methods provided in sequence
-
 
     /**
      * Reads the value of this pin.
@@ -86,10 +84,7 @@ export class Pin {
     async readPin(): Promise<number> {
         await this.ready;
         // TODO: head -c 1 /sys/class/gpio/gpio<..>/value
-        // TODO: can we use seek instead? we could then make reading synchronous.
-        return (await Deno
-            .run({cmd: ["cat", `/sys/class/gpio/gpio${this.number}/value`], stdout: 'piped'})
-            .output())[0] - 48
+        return Deno.readFileSync(`/sys/class/gpio/gpio${this.number}/value`)[0]  - 48
     }
 
     /**
