@@ -40,12 +40,19 @@ export class InstructionsQueue {
     }
     async execute(){
         await Deno.run({
-            cmd: [...(FORCE_SUDO ? ["sudo"] : []), "bash","-c", this.cmd.join(";")]
+            cmd: [...(FORCE_SUDO ? ["sudo"] : []), "bash","-c", `${this.cmd.join(";")}`]
         }).status()
         this.cmd = [];
     }
 }
 export const instructionsQueue = singleton(()=>new InstructionsQueue());
+/**
+ * executes the queued instructions up to this point.
+ * @returns a promise that resolves when the command exits
+ */
+export function executeInstructions(){
+    return instructionsQueue.getInstance().execute();
+}
 
 type PinValue = 1 | 0;
 
