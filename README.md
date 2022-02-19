@@ -68,14 +68,10 @@ while (true) {
 }
 ```
 
-# Methods
-
-TODO
-
 # Limitations
 
 1. JavaScript it not very 'precise'. i.e. no microsecond delay support for
-   interacting with hardware that requires this (e.g. DHT11)
+   interacting with hardware that requires this (e.g. DHT11). To circumvent this, a method named *pipeValue* can be used to add read instructions in the instruction queue which will be executed along other instructions (including sleep instructions) in a shell.
 
 # Deno on the pi?
 
