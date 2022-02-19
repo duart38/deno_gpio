@@ -25,10 +25,12 @@ led.setValue(0);
 led.unexport();
 executeInstructions(); // executes the above instructions.
 ```
+
 it is **highly recommended** you unexport the pin after you are done using it.
 
 It is also possible to take a more hybrid approach in which you come back to
 javascript:
+
 ```TypeScript
 // alternative hybrid (transfer from bash to JS and vice-versa)
 // note that this approach is a bit slower and can cause timing issues with some 'dumb' sensors that require precise instruction sequences.
@@ -67,7 +69,10 @@ while (true) {
 # Limitations
 
 1. JavaScript it not very 'precise'. i.e. no microsecond delay support for
-   interacting with hardware that requires this (e.g. DHT11). To circumvent this, a method named *pipeValue* can be used to add read instructions in the instruction queue which will be executed along other instructions (including sleep instructions) in a shell.
+   interacting with hardware that requires this (e.g. DHT11). To circumvent
+   this, a method named _pipeValue_ can be used to add read instructions in the
+   instruction queue which will be executed along other instructions (including
+   sleep instructions) in a shell.
 
 # Deno on the pi?
 
