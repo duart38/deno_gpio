@@ -158,7 +158,6 @@ export class Pin {
     pipeValue(filePath: string){
         instructionsQueue.getInstance().add(`head -n 1 /sys/class/gpio/gpio${this.number}/value >> ${filePath}`)
     }
-    // TODO: read from buffer (option to empty the buffer? or make default)
 }
 
 
