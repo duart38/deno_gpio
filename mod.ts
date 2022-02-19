@@ -102,8 +102,8 @@ export class Pin {
      * @param value 0 for low, 1 for high
      * @returns status of the operation
      */
-    async setValue(value: PinValue){
-        return await runEchoReplaceCommand(value.toString(), `/sys/class/gpio/gpio${this.number}/value`)
+    setValue(value: PinValue){
+        instructionsQueue.getInstance().add(`echo ${value} > /sys/class/gpio/gpio${this.number}/value`)
     }
 
     /**
@@ -111,8 +111,8 @@ export class Pin {
      * @param d the direction
      * @returns status of the operation
      */
-    async setDirection(d: PinDirection) {
-        return await runEchoReplaceCommand(d, `/sys/class/gpio/gpio${this.number}/direction`)
+    setDirection(d: PinDirection) {
+        instructionsQueue.getInstance().add(`echo ${d} > /sys/class/gpio/gpio${this.number}/direction`)
     }
 
     /**
