@@ -39,17 +39,6 @@ export enum PinDirection {
 // deno-lint-ignore prefer-const
 export let FORCE_SUDO = true;
 
-export interface Options {
-  /**
-   * Check if already exported, exports if not.
-   * Setting this to true will prevent the 'device busy' message and the small initial slowdown
-   */
-  ignoreIfAlreadyExported: boolean;
-}
-const defaultOptions: Options = {
-  ignoreIfAlreadyExported: false,
-};
-
 export class InstructionsQueue {
   private cmd: string[] = [];
   add(c: string) {
@@ -97,15 +86,9 @@ export class Pin {
     number: VPinNumber,
     direction: PinDirection,
     initialState?: PinValue,
-    options: Options = defaultOptions,
   ) {
     this.number = number;
-    if (options.ignoreIfAlreadyExported && !this.isExported()) {
-      Pin.export(this);
-    } else {
-      Pin.export(this);
-    }
-
+    Pin.export(this);
     this.setDirection(direction);
     if (initialState !== undefined) this.setValue(initialState);
   }
