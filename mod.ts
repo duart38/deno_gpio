@@ -46,12 +46,8 @@ export class InstructionsQueue {
     }
 }
 export const instructionsQueue = singleton(()=>new InstructionsQueue());
-/**
- * executes the queued instructions up to this point.
- * @returns a promise that resolves when the command exits
- */
-export function executeInstructions(){
-    return instructionsQueue.getInstance().execute();
+export async function executeInstructions(){
+    return await instructionsQueue.getInstance().execute();
 }
 
 type PinValue = 1 | 0;
@@ -86,11 +82,14 @@ export class Pin {
 
     /**
      * Reads the value of this pin.
+     * > NOTE: this method is not very price timing wise. use pipeValue to queue up an instruction and execute with precise timing.
      * @returns the value of the pin (1 or 0)
      */
     readValue(): number {
         return Deno.readFileSync(`/sys/class/gpio/gpio${this.number}/value`)[0]  - 48
     }
+
+    pipeValue(){}
 
     /**
      * Sets the pin value. to be used when the direction is set to out
