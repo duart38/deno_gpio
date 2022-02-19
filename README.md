@@ -1,5 +1,5 @@
 # Raspberry pi GPIO helpers made for Deno
-An interface for interacting and reading from the raspberry pi GPIO pins using *sysfs*
+An interface for interacting and reading from the raspberry pi GPIO pins using *sysfs*.
 
 ## Why?
 > Just for shits and giggles.
@@ -9,27 +9,50 @@ An interface for interacting and reading from the raspberry pi GPIO pins using *
 ### Turning on an LED:
 ```TypeScript
 /*
-- set pin direction to out. will auto-export the pin
-- also sets the pin value. RPs do not have analogue: 1 for HIGH 0 for LOW
+- set pin direction to out. will queue up an instruction to auto-export the pin
+- also sets the pin value to high. RPis do not have analogue: 1 for HIGH 0 for LOW
 */
-const pin23 = new Pin(23, PinDirection.OUT, 1); 
+import {Pin, PinDirection, executeInstructions, sleep} from "./mod.ts";
 
-setTimeout(async ()=>{
-    await pin23.setPin(0); // Sets pin back to 0
-    await pin23.unexport(); // unexport the pin after usage. can be done automatically
-}, 3000)
+// full bash-level execution.
+const led = new Pin(24, PinDirection.OUT, 1);
+sleep(5);
+led.setValue(0);
+led.unexport();
+executeInstructions(); // executes the above instructions.
 ```
 As denoted in the code above, it is not mandatory to unexport the pins as the library will attempt to do that at program exit but it is **highly recommended** you do so manually for in the case that the library fails to unexport.
-> async awaits can be removed if pin ordering does not matter to you.
+
+It is also possible to take a more hybrid approach in which you come back to javascript:
+```TypeScript
+// alternative hybrid (transfer from bash to JS and vice-versa)
+// note that this approach is a bit slower and can cause timing issues with some 'dumb' sensors that require precise instruction sequences.
+const led = new Pin(24, PinDirection.OUT, 1);
+// the Pin constructor queues up some export instructions.. we are executing these here
+executeInstructions(); // calls sysfs. returns a promise.
+
+// standard JS timeout..
+setTimeout(()=>{
+    led.setValue(0);
+    led.unexport();
+    executeInstructions();
+}, 4000)
+```
 
 ### Listening for button press
 ```TypeScript
+import {Pin, PinDirection, executeInstructions} from "./mod.ts";
+
 const button = new Pin(24, PinDirection.IN);
+// the Pin constructor queues up some export instructions.. execute here.
+await executeInstructions();
+console.log("Waiting for button press");
 
 while(true){
-    if(await button.readPin() == 1){
+    if(button.readValue() == 1){
         console.log("button pressed");
-        await button.unexport();
+        button.unexport();
+        executeInstructions();
         break;
     }
 }
