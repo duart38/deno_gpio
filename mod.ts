@@ -162,15 +162,13 @@ export class Pin {
      * Checks if this pin is already exported.
      * @returns true if the pin is exported, false otherwise.
      */
-    async isExported(){
-        return await Pin.isExported(this);
+    isExported(){
+        return Pin.isExported(this);
     }
 
-    static async isExported(pin: Pin): Promise<boolean> {
-        return new TextDecoder()
-        // TODO: readDir might be better?
-        .decode(await Deno.run({cmd: ["ls", "/sys/class/gpio"], stdout: "piped"}).output())
-        .includes(`gpio${pin.number}`);
+    static isExported(pin: Pin): boolean {
+        for(const {name} of Deno.readDirSync("/sys/class/gpio")) if(name.includes(`gpio${pin.number}`)) return true;
+        return false;
     }
 
     // TODO: write pin value to buffer from bash execution stack.. useful when timing is important.
