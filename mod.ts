@@ -10,27 +10,15 @@ export enum PinDirection {
 // deno-lint-ignore prefer-const
 export let FORCE_SUDO = true;
 
-// async function runEchoReplaceCommand(value: string, toFile: string){
-//     return await Deno.run({
-//         cmd: [...(FORCE_SUDO ? ["sudo"] : []), "bash","-c", `echo ${value} > ${toFile}`]
-//     }).status()
-// }
-
-function unexportOnGC(pin: Pin){
-    const registry = new FinalizationRegistry((heldValue: number) => {
-        Pin.unexport(heldValue)
-    });
-    registry.register(pin, pin.number);
-}
-
 export interface Options {
     /**
-     * Wether we should un-export the pin if a termination OS signal is captured.
+     * Check if already exported, exports if not.
+     * Setting this to true will prevent the 'device busy' message and the small initial slowdown
      */
-    unexportOnSig: boolean,
+    ignoreIfAlreadyExported: boolean
 }
 const defaultOptions: Options = {
-    unexportOnSig: true,
+    ignoreIfAlreadyExported: false
 }
 
 export class InstructionsQueue {
@@ -73,11 +61,14 @@ export class Pin {
      */
     constructor(number: VPinNumber, direction: PinDirection, initialState?: PinValue, options: Options = defaultOptions){
         this.number = number;
-        Pin.export(this)
+        if(options.ignoreIfAlreadyExported && !this.isExported()){
+            Pin.export(this)
+        }else{
+            Pin.export(this)
+        }
+        
         this.setDirection(direction);
         if(initialState !== undefined) this.setValue(initialState);
-
-        unexportOnGC(this);
     }
 
     /**
