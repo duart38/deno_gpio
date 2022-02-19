@@ -80,8 +80,6 @@ export class Pin {
         return Deno.readFileSync(`/sys/class/gpio/gpio${this.number}/value`)[0]  - 48
     }
 
-    pipeValue(){}
-
     /**
      * Queues up an instruction to set the pin value. 
      * > to be used when the direction is set to out.
@@ -152,7 +150,14 @@ export class Pin {
         return false;
     }
 
-    // TODO: write pin value to buffer from bash execution stack.. useful when timing is important.
+    /**
+     * Queues up an instruction to pipe the pin value to a buffer file which can later be read from.
+     * This method can be used when micro or nanosecond precision is needed in between reads.
+     * > This method appends to the file each time a value is read.
+     */
+    pipeValue(filePath: string){
+        instructionsQueue.getInstance().add(`head -n 1 /sys/class/gpio/gpio${this.number}/value >> ${filePath}`)
+    }
     // TODO: read from buffer (option to empty the buffer? or make default)
 }
 
