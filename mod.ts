@@ -104,13 +104,9 @@ export class Pin {
      * > Useful if other programs will be changing the pin direction.
      * @returns the pin direction
      */
-    async getDirection(): Promise<PinDirection> {
-        // TODO: make syncronous.
-        return new TextDecoder().decode(
-            await Deno
-            .run({cmd: ["cat", `/sys/class/gpio/gpio${this.number}/direction`], stdout: 'piped'})
-            .output()
-        ).includes('out') ? PinDirection.OUT : PinDirection.IN;
+    getDirection(): PinDirection {
+        return Deno.readTextFileSync(`/sys/class/gpio/gpio${this.number}/direction`)
+            .includes('out') ? PinDirection.OUT : PinDirection.IN;
     }
 
     /**
