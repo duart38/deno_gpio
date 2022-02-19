@@ -84,11 +84,10 @@ export class Pin {
     constructor(number: VPinNumber, direction: PinDirection, initialState?: PinValue, options: Options = defaultOptions){
         this.number = number;
         this.ready = new Promise((resolve)=>{
-            Pin.export(this).then(async ()=>{
-                await this.setDirection(direction);
-                resolve();
-                if(initialState !== undefined) await this.setValue(initialState);
-            })
+            Pin.export(this)
+            this.setDirection(direction);
+            if(initialState !== undefined) this.setValue(initialState);
+            instructions.getInstance().execute().then(()=>resolve());
         })
 
         unexportOnGC(this);
@@ -141,9 +140,8 @@ export class Pin {
      * @param pin the pin to export
      * @returns the process status
      */
-    static async export(pin: Pin){
+    static export(pin: Pin){
         instructions.getInstance().add(`echo ${pin.number.toString()} > /sys/class/gpio/export`)
-        return await runEchoReplaceCommand(pin.number.toString(), "/sys/class/gpio/export")
     }
     
     /**
@@ -156,7 +154,7 @@ export class Pin {
     
     static unexport(pin: Pin | number){
         const pinNumber: string = (typeof pin === "number" ? pin : pin.number).toString();
-        instructions.getInstance().add(`echo ${pinNumber} > "/sys/class/gpio/unexport"`)
+        instructions.getInstance().add(`echo ${pinNumber} > /sys/class/gpio/unexport`)
     }
 
     /**
