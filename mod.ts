@@ -153,7 +153,7 @@ export class Pin {
     /**
      * Queues up an instruction to pipe the pin value to a buffer file which can later be read from.
      * This method can be used when micro or nanosecond precision is needed in between reads.
-     * > This method appends to the file each time a value is read.
+     * > This method appends to the file each time a value is read. (note: appends on a new line each time)
      */
     pipeValue(filePath: string){
         instructionsQueue.getInstance().add(`head -n 1 /sys/class/gpio/gpio${this.number}/value >> ${filePath}`)
