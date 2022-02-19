@@ -41,7 +41,7 @@ export async function executeInstructions(){
 type PinValue = 1 | 0;
 
 /**
- * Sleeps in between commands for the given seconds. milli, micro and nano seconds are supported.
+ * Sleeps in between commands for the given seconds. milliseconds, micro and nano seconds are supported.
  * > to sleep for 40 microseconds you may use ``` sleep(4e-5); ```
  * @param seconds the seconds to sleep for.
  */
