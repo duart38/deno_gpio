@@ -94,7 +94,6 @@ export class Pin {
         unexportOnGC(this);
     }
 
-    // TODO: read to file which can be done purely inside bash and thus faster (i.e. adheres to micro-delays)
     /**
      * Reads the value of this pin.
      * @returns the value of the pin (1 or 0)
@@ -173,6 +172,9 @@ export class Pin {
         .decode(await Deno.run({cmd: ["ls", "/sys/class/gpio"], stdout: "piped"}).output())
         .includes(`gpio${pin.number}`);
     }
+
+    // TODO: write pin value to buffer from bash execution stack.. useful when timing is important.
+    // TODO: read from buffer (option to empty the buffer? or make default)
 }
 
 
