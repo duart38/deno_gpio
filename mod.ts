@@ -86,7 +86,7 @@ export class Pin {
     async readPin(): Promise<number> {
         await this.ready;
         // TODO: head -c 1 /sys/class/gpio/gpio<..>/value
-        // TODO: can we use seek instead?
+        // TODO: can we use seek instead? we could then make reading synchronous.
         return (await Deno
             .run({cmd: ["cat", `/sys/class/gpio/gpio${this.number}/value`], stdout: 'piped'})
             .output())[0] - 48
