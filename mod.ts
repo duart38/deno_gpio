@@ -1,3 +1,4 @@
+import singleton from "https://raw.githubusercontent.com/grevend/singleton/main/mod.ts"
 export type VPinNumber = 2 | 3 | 4 | 17 | 27 | 22 | 10 | 9 | 11 | 0 | 5 | 6 | 13 | 19 | 26 | 14 | 15 | 18 | 23 | 24 | 25 | 8 | 7 | 1 | 12 | 16 | 20 | 21;
 export enum PinDirection {
     IN = "in", OUT= "out"
@@ -31,7 +32,7 @@ async function runEchoReplaceCommand(value: string, toFile: string){
 
 function unexportOnGC(pin: Pin){
     const registry = new FinalizationRegistry((heldValue: number) => {
-        Pin.unexportPin(heldValue)
+        Pin.unexport(heldValue)
     });
     registry.register(pin, pin.number);
 }
@@ -52,6 +53,22 @@ const defaultOptions: Options = {
     analog: false
 }
 
+export class Instructions {
+    private cmd: string[] = [];
+    add(c: string){
+        this.cmd.push(c)
+    }
+    async execute(){
+        await Deno.run({
+            cmd: [...(FORCE_SUDO ? ["sudo"] : []), "bash","-c", this.cmd.join(";")]
+        }).status()
+        this.cmd = [];
+    }
+}
+const instructions = singleton(()=>new Instructions());
+
+type PinValue = 1 | 0;
+
 export class Pin {
     readonly number: VPinNumber;
     ready: Promise<void>;
@@ -64,24 +81,25 @@ export class Pin {
      * @param initialState optional property to automatically set the state as soon as pin is exported
      * @param options further configuration.
      */
-    constructor(number: VPinNumber, direction: PinDirection, initialState?: number, options: Options = defaultOptions){
+    constructor(number: VPinNumber, direction: PinDirection, initialState?: PinValue, options: Options = defaultOptions){
         this.number = number;
         this.ready = new Promise((resolve)=>{
-            Pin.exportPin(this).then(async ()=>{
+            Pin.export(this).then(async ()=>{
                 await this.setDirection(direction);
                 resolve();
-                if(initialState !== undefined) await this.setPin(initialState);
+                if(initialState !== undefined) await this.setValue(initialState);
             })
         })
 
         unexportOnGC(this);
     }
 
+    // TODO: read to file which can be done purely inside bash and thus faster (i.e. adheres to micro-delays)
     /**
      * Reads the value of this pin.
      * @returns the value of the pin (1 or 0)
      */
-    async readPin(): Promise<number> {
+    async readValue(): Promise<number> {
         await this.ready;
         // TODO: head -c 1 /sys/class/gpio/gpio<..>/value
         return Deno.readFileSync(`/sys/class/gpio/gpio${this.number}/value`)[0]  - 48
@@ -92,7 +110,7 @@ export class Pin {
      * @param value 0 for low, 1 for high
      * @returns status of the operation
      */
-    async setPin(value: number){
+    async setValue(value: PinValue){
         await this.ready
         return await runEchoReplaceCommand(value.toString(), `/sys/class/gpio/gpio${this.number}/value`)
     }
@@ -124,7 +142,7 @@ export class Pin {
      * @param pin the pin to export
      * @returns the process status
      */
-    static async exportPin(pin: Pin){
+    static async export(pin: Pin){
         return await runEchoReplaceCommand(pin.number.toString(), "/sys/class/gpio/export")
     }
     
@@ -133,10 +151,10 @@ export class Pin {
      * @returns the status of the process
      */
     async unexport() {
-        return await Pin.unexportPin(this)
+        return await Pin.unexport(this)
     }
     
-    static async unexportPin(pin: Pin | number){
+    static async unexport(pin: Pin | number){
         const pinNumber: string = (typeof pin === "number" ? pin : pin.number).toString();
         return await runEchoReplaceCommand(pinNumber, "/sys/class/gpio/unexport")
     }
@@ -146,11 +164,12 @@ export class Pin {
      * @returns true if the pin is exported, false otherwise.
      */
     async isExported(){
-        return await Pin.isPinExported(this);
+        return await Pin.isExported(this);
     }
 
-    static async isPinExported(pin: Pin): Promise<boolean> {
+    static async isExported(pin: Pin): Promise<boolean> {
         return new TextDecoder()
+        // TODO: readDir might be better?
         .decode(await Deno.run({cmd: ["ls", "/sys/class/gpio"], stdout: "piped"}).output())
         .includes(`gpio${pin.number}`);
     }
