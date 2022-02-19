@@ -25,14 +25,10 @@ led.setValue(0);
 led.unexport();
 executeInstructions(); // executes the above instructions.
 ```
-
-As denoted in the code above, it is not mandatory to unexport the pins as the
-library will attempt to do that at program exit but it is **highly recommended**
-you do so manually for in the case that the library fails to unexport.
+it is **highly recommended** you unexport the pin after you are done using it.
 
 It is also possible to take a more hybrid approach in which you come back to
 javascript:
-
 ```TypeScript
 // alternative hybrid (transfer from bash to JS and vice-versa)
 // note that this approach is a bit slower and can cause timing issues with some 'dumb' sensors that require precise instruction sequences.
