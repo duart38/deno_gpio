@@ -149,13 +149,13 @@ export class Pin {
      * Removes an exported pin.
      * @returns the status of the process
      */
-    async unexport() {
-        return await Pin.unexport(this)
+    unexport() {
+        return Pin.unexport(this)
     }
     
-    static async unexport(pin: Pin | number){
+    static unexport(pin: Pin | number){
         const pinNumber: string = (typeof pin === "number" ? pin : pin.number).toString();
-        return await runEchoReplaceCommand(pinNumber, "/sys/class/gpio/unexport")
+        instructions.getInstance().add(`echo ${pinNumber} > "/sys/class/gpio/unexport"`)
     }
 
     /**
