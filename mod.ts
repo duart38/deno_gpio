@@ -51,7 +51,6 @@ export function sleep(seconds: number){
 export class Pin {
     readonly number: VPinNumber;
 
-    // TODO: implement options
     /**
      * Instantiates a new pin for usage. the newly created pin will be automatically exported.
      * @param number The GPIO pin number (e.g. GPIO23 -> 23)
