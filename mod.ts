@@ -71,7 +71,6 @@ type PinValue = 1 | 0;
 
 export class Pin {
     readonly number: VPinNumber;
-    ready: Promise<void>;
 
     // TODO: implement options
     /**
@@ -83,12 +82,9 @@ export class Pin {
      */
     constructor(number: VPinNumber, direction: PinDirection, initialState?: PinValue, options: Options = defaultOptions){
         this.number = number;
-        this.ready = new Promise((resolve)=>{
-            Pin.export(this)
-            this.setDirection(direction);
-            if(initialState !== undefined) this.setValue(initialState);
-            instructionsQueue.getInstance().execute().then(()=>resolve());
-        })
+        Pin.export(this)
+        this.setDirection(direction);
+        if(initialState !== undefined) this.setValue(initialState);
 
         unexportOnGC(this);
     }
@@ -97,9 +93,7 @@ export class Pin {
      * Reads the value of this pin.
      * @returns the value of the pin (1 or 0)
      */
-    async readValue(): Promise<number> {
-        await this.ready;
-        // TODO: head -c 1 /sys/class/gpio/gpio<..>/value
+    readValue(): number {
         return Deno.readFileSync(`/sys/class/gpio/gpio${this.number}/value`)[0]  - 48
     }
 
@@ -109,7 +103,6 @@ export class Pin {
      * @returns status of the operation
      */
     async setValue(value: PinValue){
-        await this.ready
         return await runEchoReplaceCommand(value.toString(), `/sys/class/gpio/gpio${this.number}/value`)
     }
 
