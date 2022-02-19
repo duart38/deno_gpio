@@ -52,7 +52,8 @@ export class Pin {
     readonly number: VPinNumber;
 
     /**
-     * Instantiates a new pin for usage. the newly created pin will be automatically exported.
+     * Instantiates a new pin for usage. 
+     * > This new pin will queue up an export instruction. you must execute these manually using the executeInstructions method
      * @param number The GPIO pin number (e.g. GPIO23 -> 23)
      * @param direction The current flow direction. in being to receive and out being to send out
      * @param initialState optional property to automatically set the state as soon as pin is exported
@@ -72,7 +73,7 @@ export class Pin {
 
     /**
      * Reads the value of this pin.
-     * > NOTE: this method is not very price timing wise. use pipeValue to queue up an instruction and execute with precise timing.
+     * > NOTE: this method is not very precise (timing wise). use pipeValue to queue up an instruction and execute with precise timing.
      * @returns the value of the pin (1 or 0)
      */
     readValue(): number {
@@ -82,18 +83,17 @@ export class Pin {
     pipeValue(){}
 
     /**
-     * Sets the pin value. to be used when the direction is set to out
+     * Queues up an instruction to set the pin value. 
+     * > to be used when the direction is set to out.
      * @param value 0 for low, 1 for high
-     * @returns status of the operation
      */
     setValue(value: PinValue){
         instructionsQueue.getInstance().add(`echo ${value} > /sys/class/gpio/gpio${this.number}/value`)
     }
 
     /**
-     * Sets the pin direction (in or out)
+     * Queues up an instruction to set the pin direction (in or out).
      * @param d the direction
-     * @returns status of the operation
      */
     setDirection(d: PinDirection) {
         instructionsQueue.getInstance().add(`echo ${d} > /sys/class/gpio/gpio${this.number}/direction`)
@@ -105,6 +105,7 @@ export class Pin {
      * @returns the pin direction
      */
     async getDirection(): Promise<PinDirection> {
+        // TODO: make syncronous.
         return new TextDecoder().decode(
             await Deno
             .run({cmd: ["cat", `/sys/class/gpio/gpio${this.number}/direction`], stdout: 'piped'})
@@ -113,22 +114,25 @@ export class Pin {
     }
 
     /**
-     * Exports a pin. required before you operate with the pin.
+     * Queues up an instruction to export the provided pin. 
+     * This is required before you operate with the pin.
      * @param pin the pin to export
-     * @returns the process status
      */
     static export(pin: Pin){
         instructionsQueue.getInstance().add(`echo ${pin.number.toString()} > /sys/class/gpio/export`)
     }
     
     /**
-     * Removes an exported pin.
-     * @returns the status of the process
+     * Queues up an instruction to unexport this pin.
      */
     unexport() {
         return Pin.unexport(this)
     }
     
+    /**
+     * Queues up an instruction to unexport the provided pin
+     * @param pin 
+     */
     static unexport(pin: Pin | number){
         const pinNumber: string = (typeof pin === "number" ? pin : pin.number).toString();
         instructionsQueue.getInstance().add(`echo ${pinNumber} > /sys/class/gpio/unexport`)
@@ -142,6 +146,11 @@ export class Pin {
         return Pin.isExported(this);
     }
 
+    /**
+     * Checks if the given pin is exported or not
+     * @param pin the pin number
+     * @returns 
+     */
     static isExported(pin: Pin): boolean {
         for(const {name} of Deno.readDirSync("/sys/class/gpio")) if(name.includes(`gpio${pin.number}`)) return true;
         return false;
