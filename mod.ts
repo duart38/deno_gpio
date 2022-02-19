@@ -142,6 +142,7 @@ export class Pin {
      * @returns the process status
      */
     static async export(pin: Pin){
+        instructions.getInstance().add(`echo ${pin.number.toString()} > /sys/class/gpio/export`)
         return await runEchoReplaceCommand(pin.number.toString(), "/sys/class/gpio/export")
     }
     
