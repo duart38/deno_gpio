@@ -53,7 +53,7 @@ const defaultOptions: Options = {
     analog: false
 }
 
-export class Instructions {
+export class InstructionsQueue {
     private cmd: string[] = [];
     add(c: string){
         this.cmd.push(c)
@@ -65,7 +65,7 @@ export class Instructions {
         this.cmd = [];
     }
 }
-const instructions = singleton(()=>new Instructions());
+const instructionsQueue = singleton(()=>new InstructionsQueue());
 
 type PinValue = 1 | 0;
 
@@ -87,7 +87,7 @@ export class Pin {
             Pin.export(this)
             this.setDirection(direction);
             if(initialState !== undefined) this.setValue(initialState);
-            instructions.getInstance().execute().then(()=>resolve());
+            instructionsQueue.getInstance().execute().then(()=>resolve());
         })
 
         unexportOnGC(this);
@@ -141,7 +141,7 @@ export class Pin {
      * @returns the process status
      */
     static export(pin: Pin){
-        instructions.getInstance().add(`echo ${pin.number.toString()} > /sys/class/gpio/export`)
+        instructionsQueue.getInstance().add(`echo ${pin.number.toString()} > /sys/class/gpio/export`)
     }
     
     /**
@@ -154,7 +154,7 @@ export class Pin {
     
     static unexport(pin: Pin | number){
         const pinNumber: string = (typeof pin === "number" ? pin : pin.number).toString();
-        instructions.getInstance().add(`echo ${pinNumber} > /sys/class/gpio/unexport`)
+        instructionsQueue.getInstance().add(`echo ${pinNumber} > /sys/class/gpio/unexport`)
     }
 
     /**
