@@ -5,30 +5,16 @@ export enum PinDirection {
 }
 
 /**
- * Sleep for the given microseconds.
- * > NOTE: requires the use of --allow-hrtime for this method to work.
- * > NOTE: this isint really that accurate.. considering it's javascript and all
- * @example ``` deno run --allow-hrtime <script>```
- * @requires --allow-hrtime
- * @param v the amount of microseconds before resolving the promise
- * @returns a promise that resolves after the time has passed
- */
- export function sleepMicroseconds(v: number){
-    const end = performance.now() + parseFloat(`0.${v}`);
-    while(performance.now() < end);
-}
-
-/**
  * Not adding sudo might misbehave on repeated runs.
  */
 // deno-lint-ignore prefer-const
 export let FORCE_SUDO = true;
 
-async function runEchoReplaceCommand(value: string, toFile: string){
-    return await Deno.run({
-        cmd: [...(FORCE_SUDO ? ["sudo"] : []), "bash","-c", `echo ${value} > ${toFile}`]
-    }).status()
-}
+// async function runEchoReplaceCommand(value: string, toFile: string){
+//     return await Deno.run({
+//         cmd: [...(FORCE_SUDO ? ["sudo"] : []), "bash","-c", `echo ${value} > ${toFile}`]
+//     }).status()
+// }
 
 function unexportOnGC(pin: Pin){
     const registry = new FinalizationRegistry((heldValue: number) => {
@@ -42,15 +28,9 @@ export interface Options {
      * Wether we should un-export the pin if a termination OS signal is captured.
      */
     unexportOnSig: boolean,
-    /**
-     * The raspberry pi does not have any analog pins.
-     * I can dream, cant i?
-     */
-    analog: boolean,
 }
 const defaultOptions: Options = {
     unexportOnSig: true,
-    analog: false
 }
 
 export class InstructionsQueue {
@@ -65,10 +45,18 @@ export class InstructionsQueue {
         this.cmd = [];
     }
 }
-const instructionsQueue = singleton(()=>new InstructionsQueue());
+export const instructionsQueue = singleton(()=>new InstructionsQueue());
 
 type PinValue = 1 | 0;
 
+/**
+ * Sleeps in between commands for the given seconds. milli, micro and nano seconds are supported.
+ * > to sleep for 40 microseconds you may use ``` sleep(4e-5); ```
+ * @param seconds the seconds to sleep for.
+ */
+export function sleep(seconds: number){
+    instructionsQueue.getInstance().add(`sleep ${seconds}`)
+}
 export class Pin {
     readonly number: VPinNumber;
 
