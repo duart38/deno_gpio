@@ -128,6 +128,17 @@ export class Pin {
   // TODO: wait for value method? i.e. wait for 1 or 0.. async and sync versions??
 
   /**
+   * Queues up an instruction that waits until the pin is of the given value before continuing execution.
+   * > This instruction blocks all further scripts until the pin is of the given value.
+   * @param pinValue the pin value to wait for. defaults to 1 (HIGH)
+   */
+  waitForValue(pinValue: PinValue = 1){
+    instructionsQueue.getInstance().add(
+      `while true; do  if grep -q -m 1 ${pinValue} /sys/class/gpio/gpio${this.number}/value; then break;  fi; done`
+    )
+  }
+
+  /**
    * Queues up an instruction to set the pin value.
    * > to be used when the direction is set to out.
    * @param value 0 for low, 1 for high
