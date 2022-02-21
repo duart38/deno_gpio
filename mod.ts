@@ -125,7 +125,6 @@ export class Pin {
     return Deno.readFileSync(`/sys/class/gpio/gpio${this.number}/value`)[0] -
       48;
   }
-  // TODO: wait for value method? i.e. wait for 1 or 0.. async and sync versions??
 
   /**
    * Queues up an instruction that waits until the pin is of the given value before continuing execution.
