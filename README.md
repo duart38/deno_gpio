@@ -66,6 +66,16 @@ while (true) {
 }
 ```
 
+### Waiting for a pin to be a specific value
+The following will issue an instruction to wait until the provided pin is set to HIGH (1) before continuing executing other commands:
+```TypeScript
+const button = new Pin(24, PinDirection.IN);
+button.waitForValue(); // wait (and thus blocking) occurs here
+button.unexport();
+await executeInstructions(); // this is where the main loop gets blocked in JavaScript.
+```
+> Note that this blocking will happen in the sub-process created by Deno and will not block the JavaScript loop unless we use async await. it is also important to note that the blocking happens at the point of execution (i.e., when 'await executeInstructions();' is called)
+
 # Limitations
 
 1. JavaScript it not very 'precise'. i.e. no microsecond delay support for
