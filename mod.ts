@@ -57,7 +57,30 @@ export class InstructionsQueue {
   }
 }
 export const instructionsQueue = singleton(() => new InstructionsQueue());
-export async function executeInstructions() {
+
+/**
+ * executes the instructions added above or within the method (i.e. executes the instruction queue).
+ * > Executing instructions will clear the instruction queue.
+ * @example ```TypeScript
+const led = new Pin(24, PinDirection.OUT, 1);
+sleep(5);
+led.setValue(0);
+led.unexport();
+executeInstructions(); // executes the above instructions.
+
+// OR
+
+const led = new Pin(24, PinDirection.OUT, 1);
+executeInstructions(
+     sleep(5),
+     led.setValue(0),
+     led.unexport()
+); // executes the above instructions.
+ * ```
+ * @param _ This parameter does nothing. It is used to help structure code
+ * @returns a promise that resolves when all the instructions finished executing
+ */
+export async function executeInstructions(..._: unknown[]) {
   return await instructionsQueue.getInstance().execute();
 }
 
@@ -102,6 +125,7 @@ export class Pin {
     return Deno.readFileSync(`/sys/class/gpio/gpio${this.number}/value`)[0] -
       48;
   }
+  // TODO: wait for value method? i.e. wait for 1 or 0.. async and sync versions??
 
   /**
    * Queues up an instruction to set the pin value.
