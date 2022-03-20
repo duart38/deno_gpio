@@ -87,7 +87,7 @@ export async function executeInstructions(..._: unknown[]) {
 type PinValue = 1 | 0;
 
 /**
- * Sleeps in between commands for the given seconds. milliseconds, micro and nano seconds are supported.
+ * Queues up an instruction to sleeps in between commands for the given seconds. milliseconds, micro and nano seconds are supported.
  * > to sleep for 40 microseconds you may use ``` sleep(4e-5); ```
  * @param seconds the seconds to sleep for.
  */
@@ -239,4 +239,6 @@ export class Pin {
       `head -n 1 /sys/class/gpio/gpio${this.number}/value >> ${filePath}`,
     );
   }
+
+  // TODO: read 'n' bits and pipe to file for 
 }
