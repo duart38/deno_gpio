@@ -240,5 +240,15 @@ export class Pin {
     );
   }
 
-  // TODO: read 'n' bits and pipe to file for 
+  /**
+   * queues up an instruction to request a number of bits while sleeping in between each fetch.
+   * @param n number of bits to read
+   * @param toFile file to pipe the bits to
+   * @param sleep how much to sleep in between each bit fetch.
+   */
+  readNBits(n: number, toFile: string, sleep = 0){
+    instructionsQueue.getInstance().add(
+      `for ((i = 0 ; i < ${n} ; i++)); do  head -n 1 /sys/class/gpio/gpio${this.number}/value >> ${toFile}; sleep ${sleep}; done`
+    );
+  }
 }
