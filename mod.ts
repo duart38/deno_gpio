@@ -189,6 +189,15 @@ export class Pin {
   }
 
   /**
+   * Unexport the pin immediately after queening up the instruction.
+   * > This method calls ```executeInstructions```
+   */
+  async unexportImmediate(){
+    Pin.unexport(this);
+    await executeInstructions();
+  }
+
+  /**
    * Queues up an instruction to unexport the provided pin
    * @param pin
    */
